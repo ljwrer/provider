@@ -1,17 +1,61 @@
 package com.example.providertest;
 
-import android.support.v7.app.ActionBarActivity;
+import android.app.Activity;
+import android.content.ContentResolver;
+import android.content.ContentValues;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 
 
-public class MainActivity extends ActionBarActivity {
-
+public class MainActivity extends Activity {
+    private String newID;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Button add=(Button)findViewById(R.id.add);
+        add.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Uri uri=Uri.parse("content://com.example.databasetest.provider/book");
+                ContentValues values=new ContentValues();
+                values.put("name","A Clash of Kings");
+                values.put("author","George Martin");
+                values.put("pages","1040");
+                values.put("price","22.85");
+                Uri newUri=getContentResolver().insert(uri,values);
+                newID=newUri.getPathSegments().get(1);
+            }
+        });
+        Button query=(Button)findViewById(R.id.query);
+        query.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Uri uri=Uri.parse("content://com.example.databasetest.provider/book");
+                ContentResolver resolver=getContentResolver();
+                Cursor cursor=resolver.query(uri, null, null, null, null);
+                if (cursor.moveToFirst())
+                {
+                    do {
+                        String name=cursor.getString(cursor.getColumnIndex("name"));
+                        String author=cursor.getString(cursor.getColumnIndex("author"));
+                        int pages=cursor.getInt(cursor.getColumnIndex("pages"));
+                        double price=cursor.getDouble(cursor.getColumnIndex("price"));
+                        Log.d("MainActivity","book name is "+name);
+                        Log.d("MainActivity","book author is "+author);
+                        Log.d("MainActivity","book pages is "+pages);
+                        Log.d("MainActivity","book price is "+price);
+                    } while (cursor.moveToNext());
+                }
+                cursor.close();
+            }
+        });
     }
 
     @Override
