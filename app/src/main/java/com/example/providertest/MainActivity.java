@@ -1,7 +1,6 @@
 package com.example.providertest;
 
 import android.app.Activity;
-import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
@@ -29,7 +28,7 @@ public class MainActivity extends Activity {
                 values.put("author","George Martin");
                 values.put("pages","1040");
                 values.put("price","22.85");
-                Uri newUri=getContentResolver().insert(uri,values);
+                Uri newUri=getContentResolver().insert(uri, values);
                 newID=newUri.getPathSegments().get(1);
             }
         });
@@ -38,8 +37,7 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View v) {
                 Uri uri=Uri.parse("content://com.example.databasetest.provider/book");
-                ContentResolver resolver=getContentResolver();
-                Cursor cursor=resolver.query(uri, null, null, null, null);
+                Cursor cursor=getContentResolver().query(uri, null, null, null, null);
                 if (cursor.moveToFirst())
                 {
                     do {
@@ -54,6 +52,28 @@ public class MainActivity extends Activity {
                     } while (cursor.moveToNext());
                 }
                 cursor.close();
+            }
+        });
+        Button update=(Button)findViewById(R.id.update);
+        update.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Uri uri=Uri.parse("content://com.example.databasetest.provider/book/"+newID);
+                Log.d("MainActivity",newID);
+                ContentValues values=new ContentValues();
+                values.put("name", "A Strom of Swords");
+                values.put("pages",1216);
+                values.put("price",24.05);
+                getContentResolver().update(uri,values,null,null);
+
+            }
+        });
+        Button delete=(Button)findViewById(R.id.delete);
+        delete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Uri uri=Uri.parse("content://com.example.databasetest.provider/book/"+newID);
+                getContentResolver().delete(uri,null,null);
             }
         });
     }
